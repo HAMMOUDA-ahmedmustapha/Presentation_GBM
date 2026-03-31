@@ -1,0 +1,980 @@
+
+# Créer le HTML corrigé avec toutes les balises <img> et styles pour images responsives
+
+html_corrigé = """<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBM — Groupe Bayoudh Metals</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=Cormorant+Garamond:ital,wght@0,600;1,400;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg:          #ffffff;
+            --bg-off:      #f8f7f4;
+            --bg-subtle:   #f2efe9;
+            --bg-card:     #ffffff;
+            --border:      #e6e2d8;
+            --border-mid:  #d4cfc3;
+            --gold:        #b8912a;
+            --gold-light:  #d4a843;
+            --gold-pale:   #f0e4c4;
+            --gold-dim:    #e8d8a8;
+            --steel:       #1a2332;
+            --steel-mid:   #2e3d52;
+            --iron:        #4a5568;
+            --silver:      #718096;
+            --silver-light:#a0aec0;
+            --text:        #1a2332;
+            --text-mid:    #4a5568;
+            --text-light:  #718096;
+            --success:     #28a745;
+            --red:    #b83228;
+            --blue:   #1f6fa3;
+            --green:  #1a7a42;
+            --orange: #b86820;
+            --teal:   #0e6b5a;
+        }
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{
+            font-family:'DM Sans',sans-serif;
+            background:var(--bg);color:var(--text);
+            overflow-x:hidden;
+        }
+        body::after{
+            content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+            opacity:.5;
+        }
+        /* PROGRESS */
+        #pt{position:fixed;top:0;left:0;width:100%;height:3px;z-index:9999;background:var(--border)}
+        #pf{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-light));transition:width .4s cubic-bezier(.4,0,.2,1)}
+        /* NAV */
+        nav{
+            position:fixed;top:3px;left:0;width:100%;z-index:1000;
+            display:flex;align-items:center;justify-content:space-between;
+            padding:.85rem 2.5rem;
+            background:rgba(255,255,255,.93);
+            backdrop-filter:blur(24px);
+            border-bottom:1px solid var(--border);
+            box-shadow:0 1px 18px rgba(26,35,50,.05);
+        }
+        .nl{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.15em;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:.6rem}
+        .nl-sep{width:1px;height:18px;background:var(--border-mid)}
+        .nl span{color:var(--text-mid);font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:500;letter-spacing:.03em;line-height:1.35}
+        .ndots{display:flex;gap:.45rem;align-items:center}
+        .ndot{width:7px;height:7px;border-radius:50%;background:var(--border-mid);border:1px solid var(--border-mid);cursor:pointer;transition:all .3s}
+        .ndot.active{background:var(--gold);border-color:var(--gold);transform:scale(1.5)}
+        .ndot:hover{background:var(--gold-light);border-color:var(--gold-light)}
+        .nc{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--silver);letter-spacing:.1em}
+        .nc .cur{color:var(--gold);font-size:1.3rem}
+        /* SIDE NAV */
+        .snav{position:fixed;right:1.6rem;top:50%;transform:translateY(-50%);z-index:500;display:flex;flex-direction:column;gap:.7rem}
+        .snav button{width:42px;height:42px;border-radius:50%;background:var(--bg-card);border:1px solid var(--border);color:var(--gold);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;box-shadow:0 2px 12px rgba(26,35,50,.07)}
+        .snav button:hover{background:var(--gold);color:#fff;box-shadow:0 4px 20px rgba(184,145,42,.28);transform:scale(1.1)}
+        /* SLIDES */
+        .slide{min-height:100vh;padding:88px 5vw 60px;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;overflow:hidden;opacity:0;transform:translateY(36px);transition:opacity .85s cubic-bezier(.4,0,.2,1),transform .85s cubic-bezier(.4,0,.2,1)}
+        .slide.visible{opacity:1;transform:translateY(0)}
+        .si{max-width:1280px;width:100%;position:relative;z-index:2}
+        .slide:nth-child(odd){background:var(--bg)}
+        .slide:nth-child(even){background:var(--bg-off)}
+        /* TYPOGRAPHY */
+        .sec-label{font-size:.7rem;font-weight:700;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem}
+        .sec-label::before{content:'';width:26px;height:2px;background:var(--gold);border-radius:1px}
+        .sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,5.5vw,5rem);line-height:.95;color:var(--steel);margin-bottom:.9rem}
+        .sec-title .g{color:var(--gold)}
+        .sec-sub{font-size:1.02rem;color:var(--text-light);max-width:540px;line-height:1.75;margin-bottom:2.8rem}
+        .gold-rule{display:block;width:56px;height:3px;border-radius:2px;margin:.7rem 0 1.5rem}
+        
+        /* ═══════════════════════════════════════════════════════════════
+           STYLES IMAGES CORRIGÉS - Taille relative au conteneur
+           ═══════════════════════════════════════════════════════════════ */
+        
+        /* Container d'image avec ratio fixe mais responsive */
+        .img-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg-subtle);
+        }
+        
+        /* Ratio 16:9 pour les images hero */
+        .img-container.ratio-16-9 {
+            aspect-ratio: 16 / 9;
+        }
+        
+        /* Ratio 4:3 pour les images de réalisations */
+        .img-container.ratio-4-3 {
+            aspect-ratio: 4 / 3;
+        }
+        
+        /* Ratio 3:2 pour les images de produits */
+        .img-container.ratio-3-2 {
+            aspect-ratio: 3 / 2;
+        }
+        
+        /* Ratio 1:1 carré */
+        .img-container.ratio-1-1 {
+            aspect-ratio: 1 / 1;
+        }
+        
+        /* L'image remplit le conteneur sans déformation */
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+        
+        /* Zoom subtil au survol */
+        .img-container:hover img {
+            transform: scale(1.03);
+        }
+        
+        /* Fallback si image ne charge pas */
+        .img-container .img-fallback {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--silver);
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: var(--bg-subtle);
+            border: 1px dashed var(--border-mid);
+        }
+        
+        .img-container .img-fallback i {
+            font-size: 2rem;
+            opacity: 0.4;
+            color: var(--fc, var(--gold));
+        }
+        
+        .img-container .img-fallback .ph-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-mid);
+        }
+        
+        /* Masquer le fallback quand l'image est chargée */
+        .img-container img:not([src=""]) + .img-fallback,
+        .img-container img[src]:not([src=""]) ~ .img-fallback {
+            display: none;
+        }
+        
+        /* HERO */
+        #hero{background:var(--bg)}
+        .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+        .hero-eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:.8rem;margin-bottom:1.3rem}
+        .hero-eyebrow::before{content:'';width:26px;height:2px;background:var(--gold)}
+        .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,9vw,8rem);line-height:.92;color:var(--steel);margin-bottom:.6rem}
+        .hero-title .g{color:var(--gold)}
+        .hero-title .out{-webkit-text-stroke:2px var(--gold-light);color:transparent}
+        .hero-tagline{font-family:'Cormorant Garamond',serif;font-size:clamp(1rem,2vw,1.4rem);font-style:italic;color:var(--text-mid);line-height:1.5;margin-bottom:2.4rem}
+        .hero-stats{display:flex;gap:2.4rem;flex-wrap:wrap;margin-bottom:2.8rem}
+        .hstat{border-left:2px solid var(--gold-pale);padding-left:1.1rem}
+        .hstat-num{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;color:var(--gold);line-height:1}
+        .hstat-label{font-size:.7rem;color:var(--silver);letter-spacing:.08em;text-transform:uppercase}
+        .hero-cta{display:inline-flex;align-items:center;gap:.7rem;padding:.85rem 2rem;background:var(--steel);color:#fff;font-weight:600;font-size:.93rem;border:none;cursor:pointer;letter-spacing:.04em;text-decoration:none;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));transition:all .3s}
+        .hero-cta:hover{background:var(--gold);transform:translateY(-3px);box-shadow:0 8px 24px rgba(184,145,42,.25)}
+        .hero-cta-outline{display:inline-flex;align-items:center;gap:.7rem;padding:.8rem 2rem;background:transparent;border:1.5px solid var(--border-mid);color:var(--text-mid);font-weight:500;font-size:.93rem;cursor:pointer;letter-spacing:.04em;text-decoration:none;transition:all .3s;margin-left:.9rem}
+        .hero-cta-outline:hover{border-color:var(--gold);color:var(--gold)}
+        
+        /* Hero image container */
+        .hero-vis{position:relative}
+        .hero-frame {
+            position:relative;
+            overflow:hidden;
+            clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px));
+        }
+        .hero-frame .img-container {
+            aspect-ratio: 4 / 3;
+        }
+        .hero-frame::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(184,145,42,.06) 0%,transparent 60%);pointer-events:none}
+        .hero-badge{position:absolute;bottom:-1.1rem;left:-1.1rem;z-index:3;background:var(--steel);color:#fff;padding:1rem 1.4rem;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.1em;box-shadow:0 8px 28px rgba(26,35,50,.16)}
+        .hero-badge span{color:var(--gold-light);display:block;font-size:.67rem;letter-spacing:.2em;margin-bottom:.1rem}
+        
+        /* Ticker */
+        .ticker-wrap{margin-top:3.5rem;overflow:hidden;white-space:nowrap;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:.55rem 0}
+        .ticker-inner{display:inline-block;animation:ticker 22s linear infinite;font-family:'Bebas Neue',sans-serif;font-size:.97rem;letter-spacing:.18em;color:var(--silver)}
+        .ticker-inner em{color:var(--gold);font-style:normal;margin:0 1.8rem}
+        @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}}
+        
+        /* FILIALES GRID */
+        .fg{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem;margin-top:2rem}
+        .fcard{background:var(--bg-card);border:1px solid var(--border);padding:1.8rem 1.4rem 1.6rem;cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+        .fcard::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--fc,var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .35s}
+        .fcard:hover{transform:translateY(-6px);border-color:var(--fc,var(--gold));box-shadow:0 12px 32px rgba(26,35,50,.07)}
+        .fcard:hover::after{transform:scaleX(1)}
+        .fcard-num{font-size:.67rem;font-weight:700;letter-spacing:.25em;color:var(--silver);margin-bottom:.5rem;text-transform:uppercase}
+        .fcard-ico{font-size:1.75rem;margin-bottom:.9rem;display:block}
+        .fcard-name{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--steel);line-height:1;margin-bottom:.6rem}
+        .fcard-role{font-size:.77rem;color:var(--text-light);line-height:1.55}
+        
+        /* FILIALE SLIDES */
+        .fil-hero{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;margin-bottom:3.5rem}
+        .fil-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--bg-subtle);border:1px solid var(--border);padding:.32rem .88rem;font-size:.68rem;font-weight:700;letter-spacing:.2em;color:var(--fc,var(--gold));text-transform:uppercase;margin-bottom:1.2rem}
+        .fil-badge i{font-size:.4rem}
+        .fil-num{font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:.2em;color:var(--silver);margin-bottom:.3rem}
+        .fil-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,7vw,6.5rem);line-height:.9;color:var(--steel);margin-bottom:.8rem}
+        .fil-tagline{font-family:'Cormorant Garamond',serif;font-size:clamp(.93rem,1.75vw,1.28rem);font-style:italic;color:var(--text-mid);line-height:1.5;margin-bottom:1.5rem}
+        .fil-desc{font-size:.96rem;color:var(--text-mid);line-height:1.85}
+        
+        /* Specs */
+        .specs{display:flex;flex-wrap:wrap;border:1px solid var(--border);margin-top:2rem}
+        .sitem{flex:1;min-width:95px;padding:1.1rem 1.3rem;border-right:1px solid var(--border);background:var(--bg-card)}
+        .sitem:last-child{border-right:none}
+        .sval{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:var(--fc,var(--gold));line-height:1}
+        .skey{font-size:.68rem;color:var(--silver);letter-spacing:.07em;margin-top:.2rem}
+        
+        /* Images filiales - Desktop */
+        .fim-wrapper {
+            width: 100%;
+        }
+        .fim-wrapper .img-container {
+            aspect-ratio: 4 / 3;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+        
+        /* Realisations */
+        .rg{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:1rem;margin-top:1.4rem}
+        .ri{position:relative;overflow:hidden;border:1px solid var(--border);background:var(--bg-card)}
+        .ri .img-container {
+            aspect-ratio: 4 / 3;
+        }
+        .ri-lbl{padding:.65rem .8rem .5rem;background:var(--bg-off);border-top:1px solid var(--border)}
+        .ri-lbl strong{display:block;font-size:.86rem;color:var(--steel);font-weight:700}
+        .ri-lbl span{font-size:.7rem;color:var(--text-light);letter-spacing:.05em}
+        
+        /* Products */
+        .pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:1.2rem;margin-top:1.5rem}
+        .pc{background:var(--bg-card);border:1px solid var(--border);padding:1.5rem 1.3rem;transition:all .3s;position:relative}
+        .pc::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--fc,var(--gold));transform:scaleY(0);transform-origin:top;transition:transform .35s}
+        .pc:hover{border-color:var(--fc,var(--gold));box-shadow:0 4px 20px rgba(26,35,50,.06);transform:translateY(-3px)}
+        .pc:hover::before{transform:scaleY(1)}
+        .pc-icon{font-size:1.55rem;margin-bottom:.65rem;display:block;color:var(--fc,var(--gold))}
+        .pc-name{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;color:var(--steel);margin-bottom:.35rem}
+        .pc-desc{font-size:.84rem;color:var(--text-light);line-height:1.65}
+        
+        /* CONCLUSION */
+        .cg{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+        .bq{font-family:'Cormorant Garamond',serif;font-size:clamp(1.4rem,3vw,2.4rem);line-height:1.45;color:var(--steel);font-style:italic}
+        .qm{font-size:4rem;line-height:.7;color:var(--gold-pale);font-family:'Bebas Neue',sans-serif;display:block}
+        .cb{display:flex;flex-direction:column;gap:1.1rem}
+        .ci{display:flex;gap:1rem;align-items:flex-start;padding:1rem 1.3rem;background:var(--bg-off);border:1px solid var(--border);transition:border-color .2s}
+        .ci:hover{border-color:var(--gold)}
+        .ci i{color:var(--gold);font-size:1.05rem;margin-top:.18rem;flex-shrink:0}
+        .ci span{color:var(--text-mid);font-size:.9rem;line-height:1.65}
+        
+        /* FOOTER */
+        footer{background:var(--steel);border-top:3px solid var(--gold);padding:2.8rem 5vw 2rem;text-align:center;position:relative;z-index:2}
+        .fl{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--gold);letter-spacing:.12em}
+        .fs{font-size:.73rem;color:rgba(255,255,255,.45);letter-spacing:.18em;margin-top:.3rem}
+        .fline{width:55px;height:1px;background:rgba(184,145,42,.35);margin:1.4rem auto}
+        .ffil{display:flex;justify-content:center;flex-wrap:wrap;gap:1.4rem;margin-bottom:1.4rem}
+        .ffil span{font-size:.78rem;color:rgba(255,255,255,.38);letter-spacing:.09em}
+        .ffil span.hi{color:rgba(255,255,255,.72)}
+        .fc{font-size:.7rem;color:rgba(255,255,255,.22)}
+        
+        /* SCROLL HINT */
+        .sh{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.4rem;font-size:.63rem;letter-spacing:.22em;color:var(--silver);text-transform:uppercase;animation:sp 2.2s ease-in-out infinite}
+        @keyframes sp{0%,100%{opacity:.3;transform:translateX(-50%) translateY(0)}50%{opacity:1;transform:translateX(-50%) translateY(5px)}}
+        
+        /* STAGGER */
+        .stagger>*{opacity:0;transform:translateY(16px);transition:opacity .52s ease,transform .52s ease}
+        .stagger.in>*:nth-child(1){opacity:1;transform:none;transition-delay:.07s}
+        .stagger.in>*:nth-child(2){opacity:1;transform:none;transition-delay:.14s}
+        .stagger.in>*:nth-child(3){opacity:1;transform:none;transition-delay:.21s}
+        .stagger.in>*:nth-child(4){opacity:1;transform:none;transition-delay:.28s}
+        .stagger.in>*:nth-child(5){opacity:1;transform:none;transition-delay:.35s}
+        .stagger.in>*:nth-child(6){opacity:1;transform:none;transition-delay:.42s}
+        .stagger.in>*:nth-child(n+7){opacity:1;transform:none;transition-delay:.49s}
+        
+        /* RESPONSIVE */
+        @media(max-width:1100px){
+            .fg{grid-template-columns:repeat(3,1fr)}
+            .fil-hero,.hero-grid,.cg{grid-template-columns:1fr;gap:2rem}
+            .hero-frame .img-container {
+                aspect-ratio: 16 / 9;
+            }
+        }
+        @media(max-width:768px){
+            nav{padding:.75rem 1.2rem}
+            .nl span,.nl-sep{display:none}
+            .fg{grid-template-columns:repeat(2,1fr)}
+            .slide{padding:78px 4vw 48px}
+            .pg{grid-template-columns:1fr}
+            .rg{grid-template-columns:repeat(2,1fr)}
+            .snav{right:.7rem}
+            .hero-stats{gap:1.3rem}
+            .img-container {
+                aspect-ratio: 16 / 9 !important;
+            }
+        }
+        @media(max-width:480px){
+            .fg{grid-template-columns:1fr}
+            .hero-title{font-size:3.8rem}
+            .rg{grid-template-columns:1fr}
+            .specs{flex-direction:column}
+            .sitem{border-right:none;border-bottom:1px solid var(--border)}
+            .ndots{display:none}
+            .hero-cta-outline{display:none}
+            .img-container {
+                aspect-ratio: 4 / 3 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="pt"><div id="pf"></div></div>
+
+<nav>
+    <a href="#hero" class="nl">
+        GBM
+        <div class="nl-sep"></div>
+        <span>Groupe Bayoudh<br>Metals</span>
+    </a>
+    <div class="ndots" id="ndots"></div>
+    <div class="nc"><span class="cur" id="ncur">01</span><span style="color:var(--border-mid)">&thinsp;/&thinsp;</span><span id="ntot">08</span></div>
+</nav>
+
+<div class="snav">
+    <button id="pb"><i class="fas fa-chevron-up"></i></button>
+    <button id="nb"><i class="fas fa-chevron-down"></i></button>
+</div>
+
+<!-- ══ 01 HERO ══════════════════════════════ -->
+<section class="slide" id="hero" data-index="0">
+    <div class="si">
+        <div class="hero-grid">
+            <div>
+                <div class="hero-eyebrow">Monastir, Tunisie — Depuis 1998</div>
+                <h1 class="hero-title">
+                    <span class="out">GROUPE</span><br>
+                    <span class="g">BAYOUDH</span><br>
+                    METALS
+                </h1>
+                <p class="hero-tagline">Cinq filiales. Une vision industrielle.<br>L'acier au cœur de la Tunisie.</p>
+                <div class="hero-stats stagger">
+                    <div class="hstat"><div class="hstat-num">5</div><div class="hstat-label">Filiales</div></div>
+                    <div class="hstat"><div class="hstat-num">25+</div><div class="hstat-label">Ans d'expertise</div></div>
+                    <div class="hstat"><div class="hstat-num">1000+</div><div class="hstat-label">Projets</div></div>
+                    <div class="hstat"><div class="hstat-num">24</div><div class="hstat-label">Gouvernorats</div></div>
+                </div>
+                <a href="" class="hero-cta"><i class="fas fa-industry"></i> Découvrir le groupe</a>
+                <a href="" class="hero-cta-outline"><i class="fas fa-arrow-down"></i> Nos filiales</a>
+            </div>
+            <div class="hero-vis">
+                <div class="hero-frame">
+                    <div class="img-container">
+                        <img src="gbm-hero.jpg" alt="Groupe Bayoudh Metals" loading="eager">
+                        <div class="img-fallback">
+                            <i class="fas fa-image"></i>
+                            <div class="ph-name">gbm-hero.jpg</div>
+                            <div>Photo principale GBM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-badge"><span>Fondé en</span>1998</div>
+            </div>
+        </div>
+        <div class="ticker-wrap">
+            <div class="ticker-inner">
+                <em>METTEC</em> Cabines Modulaires &nbsp;·&nbsp;
+                <em>COGEPAM</em> Réfrigération Industrielle &nbsp;·&nbsp;
+                <em>TUNISIE PANNEAUX</em> Panneaux Sandwich &nbsp;·&nbsp;
+                <em>TRANSMETAL</em> Transformation Acier &nbsp;·&nbsp;
+                <em>STTM</em> Import & Transport Métaux &nbsp;·&nbsp;
+                <em>METTEC</em> Cabines Modulaires &nbsp;·&nbsp;
+                <em>COGEPAM</em> Réfrigération Industrielle &nbsp;·&nbsp;
+                <em>TUNISIE PANNEAUX</em> Panneaux Sandwich &nbsp;·&nbsp;
+                <em>TRANSMETAL</em> Transformation Acier &nbsp;·&nbsp;
+                <em>STTM</em> Import & Transport Métaux &nbsp;·&nbsp;
+            </div>
+        </div>
+    </div>
+    <div class="sh"><i class="fas fa-chevron-down"></i>Défiler</div>
+</section>
+
+<!-- ══ 02 FILIALES OVERVIEW ════════════════ -->
+<section class="slide" id="filiales" data-index="1">
+    <div class="si">
+        <div class="sec-label">Le groupe</div>
+        <h2 class="sec-title">Cinq <span class="g">Expertises</span><br>Un Empire Industriel</h2>
+        <p class="sec-sub">Chaque filiale du Groupe Bayoudh Metals est une référence dans son domaine, opérant depuis la Zone Industrielle Menzel Harb, Monastir.</p>
+        <div class="fg stagger">
+            <div class="fcard" style="--fc:var(--red)" onclick="goToSlide(2)">
+                <div class="fcard-num">01 /</div>
+                <span class="fcard-ico" style="color:var(--red)"><i class="fas fa-cubes"></i></span>
+                <div class="fcard-name">METTEC</div>
+                <div class="fcard-role">Cabines modulaires acier · Structures clés en main · EN 1090 certifié</div>
+            </div>
+            <div class="fcard" style="--fc:var(--blue)" onclick="goToSlide(3)">
+                <div class="fcard-num">02 /</div>
+                <span class="fcard-ico" style="color:var(--blue)"><i class="fas fa-snowflake"></i></span>
+                <div class="fcard-name">COGEPAM</div>
+                <div class="fcard-role">Réfrigération industrielle · Chambres froides · Climatisation adiabatique</div>
+            </div>
+            <div class="fcard" style="--fc:var(--green)" onclick="goToSlide(4)">
+                <div class="fcard-num">03 /</div>
+                <span class="fcard-ico" style="color:var(--green)"><i class="fas fa-layer-group"></i></span>
+                <div class="fcard-name">TUNISIE<br>PANNEAUX</div>
+                <div class="fcard-role">Panneaux sandwich · Couverture · Bardage · Froid industriel</div>
+            </div>
+            <div class="fcard" style="--fc:var(--orange)" onclick="goToSlide(5)">
+                <div class="fcard-num">04 /</div>
+                <span class="fcard-ico" style="color:var(--orange)"><i class="fas fa-cog"></i></span>
+                <div class="fcard-name">TRANS<wbr>METAL</div>
+                <div class="fcard-role">Tubes soudés · Refendage tôle · Profilage acier galvanisé</div>
+            </div>
+            <div class="fcard" style="--fc:var(--teal)" onclick="goToSlide(6)">
+                <div class="fcard-num">05 /</div>
+                <span class="fcard-ico" style="color:var(--teal)"><i class="fas fa-ship"></i></span>
+                <div class="fcard-name">STTM</div>
+                <div class="fcard-role">Import matière première · Logistique & transport · Flux intra-groupe</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ 03 METTEC ════════════════════════════ -->
+<section class="slide" id="s-mettec" data-index="2" style="--fc:var(--red)">
+    <div class="si">
+        <div class="fil-hero">
+            <div>
+                <div class="fil-badge"><i class="fas fa-circle"></i> Filiale 01</div>
+                <div class="fil-num">METTEC —</div>
+                <h2 class="fil-title">Cabines<br>Modulaires</h2>
+                <span class="gold-rule" style="background:linear-gradient(90deg,var(--red),rgba(184,50,40,.08))"></span>
+                <p class="fil-tagline">Bâti pour l'éternité — Acier S355 galvanisé, EN 1090 certifié</p>
+                <p class="fil-desc">Spécialiste des cabines modulaires clés en main depuis Menzel Harb. Chaque ouvrage suit un processus rigoureux en 11 étapes — de l'analyse du cahier des charges à la remise des clés — avec garantie décennale et contrôle CND ultrason 100%.</p>
+                <div class="specs">
+                    <div class="sitem"><div class="sval">200+</div><div class="skey">Cabines livrées</div></div>
+                    <div class="sitem"><div class="sval">15 ans</div><div class="skey">D'expertise</div></div>
+                    <div class="sitem"><div class="sval">10 ans</div><div class="skey">Garantie</div></div>
+                    <div class="sitem"><div class="sval">87μm</div><div class="skey">Galvanisation</div></div>
+                </div>
+            </div>
+            <div class="fim-wrapper">
+                <div class="img-container">
+                    <img src="mettec-hero.jpg" alt="METTEC Cabines Modulaires" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-image"></i>
+                        <div class="ph-name">mettec-hero.jpg</div>
+                        <div>Photo principale METTEC</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sec-label">Réalisations</div>
+        <div class="rg stagger">
+            <div class="ri">
+                <div class="img-container">
+                    <img src="mettec-villa-bekalta.jpg" alt="Villa Bekalta" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-home"></i>
+                        <div class="ph-name"></div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Villa Bekalta</strong><span>Habitation</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="mettec-admin-transmetal.jpg" alt="Admin TransMetal" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-building"></i>
+                        <div class="ph-name"></div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Admin TransMetal</strong><span>Bureautique</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="mettec-aeroport-monastir.jpg" alt="Aéroport Monastir" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-plane"></i>
+                        <div class="ph-name">mettec-aeroport-monastir.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Aéroport Monastir</strong><span>Industriel</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="mettec-villa-benarous.jpg" alt="Villa Ben Arous" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-shield-alt"></i>
+                        <div class="ph-name"></div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Villa Ben Arous</strong><span></span></div>
+            </div>
+        </div>
+        <div class="sec-label" style="margin-top:2.5rem">Produits & Certifications</div>
+        <div class="pg stagger">
+            <div class="pc"><span class="pc-icon"><i class="fas fa-ruler-combined"></i></span><div class="pc-name">Acier S355</div><div class="pc-desc">Structure certifiée EN 1090 EXC2 — 42 000N de résistance, traçabilité ISO 9001.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-shield-virus"></i></span><div class="pc-name">Galvanisation 87μm</div><div class="pc-desc">Protection anticorrosion ISO 1461 — résistance UV prolongée, durée de vie 15–20 ans.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-thermometer-empty"></i></span><div class="pc-name">Isolation PU 100mm</div><div class="pc-desc">Panneaux polyuréthane λ=0.022 W/m·K — performance thermique RT 2020.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-microscope"></i></span><div class="pc-name">CND Ultrason</div><div class="pc-desc">Contrôle non destructif 100% des soudures — ISO 9606, qualification MIG/MAG TIG.</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ 04 COGEPAM ═══════════════════════════ -->
+<section class="slide" id="s-cogepam" data-index="3" style="--fc:var(--blue)">
+    <div class="si">
+        <div class="fil-hero">
+            <div>
+                <div class="fil-badge"><i class="fas fa-circle"></i> Filiale 02</div>
+                <div class="fil-num">COGEPAM —</div>
+                <h2 class="fil-title">Réfrigération<br>Industrielle</h2>
+                <span class="gold-rule" style="background:linear-gradient(90deg,var(--blue),rgba(31,111,163,.08))"></span>
+                <p class="fil-tagline">Expert en froid industriel et climatisation adiabatique depuis 2015</p>
+                <p class="fil-desc">Filiale du Groupe GBM, COGEPAM accompagne les professionnels de l'agroalimentaire, de la restauration et de l'industrie avec des solutions de froid sur mesure. Maintenance 24/7 dans les 24 gouvernorats. Conformité HACCP et BPF.</p>
+                <div class="specs">
+                    <div class="sitem"><div class="sval">500+</div><div class="skey">Installations</div></div>
+                    <div class="sitem"><div class="sval">98%</div><div class="skey">Clients satisfaits</div></div>
+                    <div class="sitem"><div class="sval">-25°C</div><div class="skey">Temp. min.</div></div>
+                    <div class="sitem"><div class="sval">90%</div><div class="skey">Économie énergie</div></div>
+                </div>
+            </div>
+            <div class="fim-wrapper">
+                <div class="img-container">
+                    <img src="cogepam-hero.jpg" alt="COGEPAM Réfrigération Industrielle" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-image"></i>
+                        <div class="ph-name">cogepam-hero.jpg</div>
+                        <div>Chambre froide industrielle</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sec-label">Réalisations clients</div>
+        <div class="rg stagger">
+            <div class="ri">
+                <div class="img-container">
+                    <img src="cogepam-chambre-froide-monastir.jpg" alt="Chambre Froide Monastir" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-warehouse"></i>
+                        <div class="ph-name">cogepam-chambre-froide-monastir.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Chambre Froide Industrielle</strong><span>Monastir</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="cogepam-chambre-negative.jpg" alt="Chambre Négative" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-snowflake"></i>
+                        <div class="ph-name">cogepam-chambre-negative.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Chambre Négative</strong><span>Congélation ultra</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="cogepam-climatisation-adiabatique.jpg" alt="Climatisation Adiabatique" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-wind"></i>
+                        <div class="ph-name">cogepam-climatisation-adiabatique.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Climatisation Adiabatique</strong><span>Unité industrielle</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="cogepam-solution-modulaire.jpg" alt="Solution Modulaire" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-boxes"></i>
+                        <div class="ph-name">cogepam-solution-modulaire.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Solution Modulaire</strong><span>Sur mesure</span></div>
+            </div>
+        </div>
+        <div class="sec-label" style="margin-top:2.5rem">Gamme de produits</div>
+        <div class="pg stagger">
+            <div class="pc"><span class="pc-icon"><i class="fas fa-igloo"></i></span><div class="pc-name">Chambres Froides</div><div class="pc-desc">Solutions positives, négatives et modulaires de -25°C à +10°C. Isolation PU/PIR, conformité HACCP.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-leaf"></i></span><div class="pc-name">Climatisation Adiabatique</div><div class="pc-desc">Rafraîchissement écologique sans fluide frigorigène. -90% consommation. Air 100% neuf.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-layer-group"></i></span><div class="pc-name">Panneaux Sandwich</div><div class="pc-desc">Isolation thermique PU haute densité, 40 à 200mm, finitions inox et prélaqué.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-door-open"></i></span><div class="pc-name">Portes Frigorifiques</div><div class="pc-desc">Coulissantes et battantes, joints silicone, inox 304, dégagement rapide intégré.</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ 05 TUNISIE PANNEAUX ══════════════════ -->
+<section class="slide" id="s-tunpan" data-index="4" style="--fc:var(--green)">
+    <div class="si">
+        <div class="fil-hero">
+            <div>
+                <div class="fil-badge"><i class="fas fa-circle"></i> Filiale 03</div>
+                <div class="fil-num">TUNISIE PANNEAUX —</div>
+                <h2 class="fil-title">Isolation<br>Intelligente</h2>
+                <span class="gold-rule" style="background:linear-gradient(90deg,var(--green),rgba(26,122,66,.08))"></span>
+                <p class="fil-tagline">Fabricant tunisien de panneaux sandwich à rayonnement international</p>
+                <p class="fil-desc">Tunisie Panneaux propose une gamme complète de panneaux pour la couverture, le bardage et les applications frigorifiques. Présent aux foires MIDIBAT, SIB Casablanca et Salon CARTHAGE, et actif sur les marchés africains depuis 2014.</p>
+                <div class="specs">
+                    <div class="sitem"><div class="sval">7</div><div class="skey">Gammes produits</div></div>
+                    <div class="sitem"><div class="sval">Afrique</div><div class="skey">Présence export</div></div>
+                    <div class="sitem"><div class="sval">PU</div><div class="skey">Mousse haute densité</div></div>
+                    <div class="sitem"><div class="sval">200mm</div><div class="skey">Épaisseur max.</div></div>
+                </div>
+            </div>
+            <div class="fim-wrapper">
+                <div class="img-container">
+                    <img src="tunpan-hero.jpg" alt="Tunisie Panneaux Usine" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-image"></i>
+                        <div class="ph-name">tunpan-hero.jpg</div>
+                        <div>Usine Tunisie Panneaux</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sec-label">Présence internationale</div>
+        <div class="rg stagger">
+            <div class="ri">
+                <div class="img-container">
+                    <img src="tunpan-midibat-2015.jpg" alt="Foire MIDIBAT 2015" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-globe-africa"></i>
+                        <div class="ph-name">tunpan-midibat-2015.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Foire MIDIBAT 2015</strong><span>Tunisie</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="tunpan-sib-casablanca.jpg" alt="SIB Casablanca" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-flag"></i>
+                        <div class="ph-name">tunpan-sib-casablanca.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>SIB Casablanca</strong><span>Maroc 2014</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="tunpan-salon-carthage.jpg" alt="Salon CARTHAGE" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-handshake"></i>
+                        <div class="ph-name">tunpan-salon-carthage.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Salon CARTHAGE</strong><span>Mai 2014</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="tunpan-tournee-afrique.jpg" alt="Tournée Afrique" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-route"></i>
+                        <div class="ph-name">tunpan-tournee-afrique.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Tournée Afrique</strong><span>Expansion 2014</span></div>
+            </div>
+        </div>
+        <div class="sec-label" style="margin-top:2.5rem">Catalogue produits</div>
+        <div class="pg stagger">
+            <div class="pc"><span class="pc-icon"><i class="fas fa-home"></i></span><div class="pc-name">Panneau de Couverture</div><div class="pc-desc">Panneaux sandwich pour toitures industrielles et commerciales, haute résistance aux intempéries.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-columns"></i></span><div class="pc-name">Panneau de Bardage</div><div class="pc-desc">Bardage de façade et solutions de froid, isolation optimale, finitions variées.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-door-closed"></i></span><div class="pc-name">Portes Frigorifiques</div><div class="pc-desc">Portes isothermes pour chambres froides et entrepôts, étanchéité maximale certifiée.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-ruler-horizontal"></i></span><div class="pc-name">Profil Z & Finitions</div><div class="pc-desc">Profils Z, Nercesco, pièces de finition couverture, bardage et froid — stock immédiat.</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ 06 TRANSMETAL ════════════════════════ -->
+<section class="slide" id="s-transmetal" data-index="5" style="--fc:var(--orange)">
+    <div class="si">
+        <div class="fil-hero">
+            <div>
+                <div class="fil-badge"><i class="fas fa-circle"></i> Filiale 04</div>
+                <div class="fil-num">TRANSMETAL —</div>
+                <h2 class="fil-title">Transformation<br>de l'Acier</h2>
+                <span class="gold-rule" style="background:linear-gradient(90deg,var(--orange),rgba(184,104,32,.08))"></span>
+                <p class="fil-tagline">Votre partenaire en tubes soudés et transformation de tôle depuis 2012</p>
+                <p class="fil-desc">Créée en 2012 à Menzel Harb, TRANSMETAL est spécialisée dans la fabrication de tubes soudés et la transformation de la tôle. Galvanisé, laminé à froid ou à chaud — une large gamme pour la construction, l'industrie et le BTP, avec contrôle qualité sur chaque fardeau.</p>
+                <div class="specs">
+                    <div class="sitem"><div class="sval">2012</div><div class="skey">Création</div></div>
+                    <div class="sitem"><div class="sval">4</div><div class="skey">Formes de tubes</div></div>
+                    <div class="sitem"><div class="sval">100%</div><div class="skey">Contrôle qualité</div></div>
+                    <div class="sitem"><div class="sval">ZI</div><div class="skey">Menzel Harb</div></div>
+                </div>
+            </div>
+            <div class="fim-wrapper">
+                <div class="img-container">
+                    <img src="transmetal-hero.jpg" alt="TRANSMETAL Usine" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-image"></i>
+                        <div class="ph-name">transmetal-hero.jpg</div>
+                        <div>Usine TRANSMETAL Monastir</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sec-label">Productions phares</div>
+        <div class="rg stagger">
+            <div class="ri">
+                <div class="img-container">
+                    <img src="transmetal-tubes-soudesfab.jpg" alt="Tubes Soudés" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-circle-notch"></i>
+                        <div class="ph-name">transmetal-tubes-soudesfab.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Tubes Soudés</strong><span>Ronds, carrés, rectangulaires</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="transmetal-refendage-tole.jpg" alt="Refendage Tôle" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-cut"></i>
+                        <div class="ph-name">transmetal-refendage-tole.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Refendage Tôle</strong><span>Découpage précis</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="transmetal-rails-securite.jpg" alt="Rails Sécurité" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-road"></i>
+                        <div class="ph-name">transmetal-rails-securite.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Rails de Sécurité</strong><span>Routier</span></div>
+            </div>
+            <div class="ri">
+                <div class="img-container">
+                    <img src="transmetal-bacs-acier.jpg" alt="Bacs Acier" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-stream"></i>
+                        <div class="ph-name">transmetal-bacs-acier.jpg</div>
+                    </div>
+                </div>
+                <div class="ri-lbl"><strong>Bacs Acier</strong><span>Nervurés & ondulés</span></div>
+            </div>
+        </div>
+        <div class="sec-label" style="margin-top:2.5rem">Spécialités</div>
+        <div class="pg stagger">
+            <div class="pc"><span class="pc-icon"><i class="fas fa-dot-circle"></i></span><div class="pc-name">Tubes Soudés</div><div class="pc-desc">Ronds, carrés, rectangulaires et ovales en acier galvanisé, laminé à chaud et froid. Tests d'évasement sur chaque fardeau.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-expand-arrows-alt"></i></span><div class="pc-name">Refendage & Profilage</div><div class="pc-desc">Découpage, pliage et profilage de tôles : faîtières, bavettes, coïs, profilés pour rideaux, bacs nervurés.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-industry"></i></span><div class="pc-name">Sidérurgie</div><div class="pc-desc">Gamme complète de produits sidérurgiques pour la construction métallique et le BTP.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-check-double"></i></span><div class="pc-name">Contrôle Qualité</div><div class="pc-desc">Contrôles dimensionnels et tests d'évasement systématiques — qualité constante garantie.</div></div>
+        </div>
+    </div>
+</section>
+
+
+
+
+<!-- ══ 07 STTM ══════════════════════════════ -->
+<section class="slide" id="s-sttm" data-index="6" style="--fc:var(--teal)">
+    <div class="si">
+        <div class="fil-hero">
+            <div>
+                <div class="fil-badge"><i class="fas fa-circle"></i> Filiale 05</div>
+                <div class="fil-num">STTM —</div>
+                <h2 class="fil-title">Import &<br>Transport</h2>
+                <span class="gold-rule" style="background:linear-gradient(90deg,var(--teal),rgba(14,107,90,.08))"></span>
+                <p class="fil-tagline">Le poumon logistique du Groupe — de la source à l'atelier</p>
+                <p class="fil-desc">STTM est la filiale stratégique du Groupe GBM dédiée à l'importation de matières premières métalliques et à la logistique de transport. Elle approvisionne les autres filiales en bobines d'acier, tôles et profilés, et distribue les produits finis vers les chantiers et clients à travers toute la Tunisie.</p>
+                <div class="specs">
+                    <div class="sitem"><div class="sval">GBM</div><div class="skey">Fournisseur interne</div></div>
+                    <div class="sitem"><div class="sval">Import</div><div class="skey">Matière première</div></div>
+                    <div class="sitem"><div class="sval">24</div><div class="skey">Gouvernorats</div></div>
+                    <div class="sitem"><div class="sval">Flux</div><div class="skey">Logistique optimisée</div></div>
+                </div>
+            </div>
+            <div class="fim-wrapper">
+                <div class="img-container">
+                    <img src="sttm-hero.jpg" alt="TRANSMETAL Usine" loading="lazy">
+                    <div class="img-fallback">
+                        <i class="fas fa-image"></i>
+                        <div class="ph-name"></div>
+                        <div>STTM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sec-label">Opérations & flux</div>
+        <div class="rg stagger">
+            <div class="ri"><div class="img-ph ri-img"><i class="fas fa-ship"></i><div class="ph-name">sttm-import-port.jpg</div></div><div class="ri-lbl"><strong>Import Port</strong><span>Arrivée bobines & tôles</span></div></div>
+            <div class="ri"><div class="img-ph ri-img"><i class="fas fa-warehouse"></i><div class="ph-name">sttm-entrepot-stock.jpg</div></div><div class="ri-lbl"><strong>Entrepôt Stock</strong><span>Stockage matière première</span></div></div>
+            <div class="ri"><div class="img-ph ri-img"><i class="fas fa-truck"></i><div class="ph-name">sttm-livraison-chantier.jpg</div></div><div class="ri-lbl"><strong>Livraison Chantier</strong><span>Distribution nationale</span></div></div>
+            <div class="ri"><div class="img-ph ri-img"><i class="fas fa-network-wired"></i><div class="ph-name">sttm-chaine-logistique.jpg</div></div><div class="ri-lbl"><strong>Chaîne Logistique</strong><span>Flux intra-groupe</span></div></div>
+        </div>
+        <div class="sec-label" style="margin-top:2.5rem">Services</div>
+        <div class="pg stagger">
+            <div class="pc"><span class="pc-icon"><i class="fas fa-globe"></i></span><div class="pc-name">Import Matière Première</div><div class="pc-desc">Approvisionnement en bobines d'acier laminé, tôles galvanisées, profilés — sourcing international optimisé.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-truck-loading"></i></span><div class="pc-name">Transport & Distribution</div><div class="pc-desc">Flotte dédiée pour livraison des produits finis sur chantiers et clients dans les 24 gouvernorats.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-boxes"></i></span><div class="pc-name">Gestion de Stock</div><div class="pc-desc">Entrepôts logistiques à Menzel Harb — stock tampon pour alimenter les lignes de production en continu.</div></div>
+            <div class="pc"><span class="pc-icon"><i class="fas fa-link"></i></span><div class="pc-name">Chaîne Intra-Groupe</div><div class="pc-desc">Lien stratégique entre les 5 filiales GBM — synchronisation des approvisionnements et délais optimisés.</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ 08 CONCLUSION ════════════════════════ -->
+<section class="slide" id="conclusion" data-index="7">
+    <div class="si">
+        <div class="sec-label">Groupe Bayoudh Metals</div>
+        <h2 class="sec-title">L'acier tunisien<br><span class="g">à l'international</span></h2>
+        <div class="cg" style="margin-top:3rem">
+            <div>
+                <p class="bq">
+                    <span class="qm">"</span>
+                    Cinq filiales, une seule ambition — façonner le métal tunisien avec l'excellence pour servir les marchés de demain.
+                </p>
+                <div style="margin-top:2.8rem">
+                    <div class="sec-label" style="margin-bottom:1.2rem">Nos filiales</div>
+                    <div style="display:flex;flex-direction:column;gap:.55rem">
+                        <div style="display:flex;align-items:center;gap:1rem"><span style="width:9px;height:9px;border-radius:50%;background:var(--red);flex-shrink:0"></span><span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--steel);letter-spacing:.05em">METTEC</span><span style="font-size:.8rem;color:var(--text-light)">Cabines modulaires acier</span></div>
+                        <div style="display:flex;align-items:center;gap:1rem"><span style="width:9px;height:9px;border-radius:50%;background:var(--blue);flex-shrink:0"></span><span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--steel);letter-spacing:.05em">COGEPAM</span><span style="font-size:.8rem;color:var(--text-light)">Réfrigération industrielle</span></div>
+                        <div style="display:flex;align-items:center;gap:1rem"><span style="width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0"></span><span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--steel);letter-spacing:.05em">TUNISIE PANNEAUX</span><span style="font-size:.8rem;color:var(--text-light)">Panneaux sandwich</span></div>
+                        <div style="display:flex;align-items:center;gap:1rem"><span style="width:9px;height:9px;border-radius:50%;background:var(--orange);flex-shrink:0"></span><span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--steel);letter-spacing:.05em">TRANSMETAL</span><span style="font-size:.8rem;color:var(--text-light)">Transformation acier</span></div>
+                        <div style="display:flex;align-items:center;gap:1rem"><span style="width:9px;height:9px;border-radius:50%;background:var(--teal);flex-shrink:0"></span><span style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--steel);letter-spacing:.05em">STTM</span><span style="font-size:.8rem;color:var(--text-light)">Import & transport métaux</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="cb">
+                <div class="ci"><i class="fas fa-map-marker-alt"></i><span>Zone Industrielle Menzel Harb<br>Monastir, Tunisie</span></div>
+                <div class="ci"><i class="fas fa-phone"></i><span>Mettec : +216 29 22 54 05<br>COGEPAM : +216 29 07 73 42 / +216 29 67 81 00<br>TRANSMETAL : +216 29 53 68 70 / +216 36 40 58 22 <br>Tunisie Panneaux : +216 36 405 822 / +216 36 40 58 23</span></div>
+                <div class="ci"><i class="fas fa-envelope"></i><span>mettec@gbm.tn<br>cogepam@gbm.tn<br>commercial.transmetal@gbm.tn<br>commercial.tunisiepanneaux@gbm.tn</span></div>
+                <div class="ci"><i class="fas fa-globe-africa"></i><span>Présence dans les 24 gouvernorats tunisiens<br>Export Afrique du Nord & Europe</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="fl">GBM</div>
+    <div class="fs">GROUPE BAYOUDH METALS — MONASTIR, TUNISIE</div>
+    <div class="fline"></div>
+    <div class="ffil">
+        <span class="hi">METTEC</span><span>·</span>
+        <span class="hi">COGEPAM</span><span>·</span>
+        <span class="hi">TUNISIE PANNEAUX</span><span>·</span>
+        <span class="hi">TRANSMETAL</span><span>·</span>
+        <span class="hi">STTM</span>
+    </div>
+    <div class="fline" style="margin: 1.2rem auto;"></div>
+    <a href="https://www.linkedin.com/in/hammouda-ahmed-mustapha-a55270195/?skipRedirect=true" 
+       target="_blank" 
+       class="fdesign"
+       style="font-size: .75rem; 
+              color: rgba(255,255,255,.35); 
+              text-decoration: none; 
+              letter-spacing: .1em;
+              transition: all .3s ease;
+              display: inline-flex;
+              align-items: center;
+              gap: .5rem;
+              padding: .4rem .8rem;
+              border-radius: 4px;">
+        <i class="fas fa-code" style="font-size: .8rem;"></i>
+        Designed by <span style="color: var(--gold-light); font-weight: 500;">AMH</span>
+    </a>
+    <div class="fc" style="margin-top: 1rem;">© 2026 Groupe Bayoudh Metals. Tous droits réservés.</div>
+</footer>
+<style>
+    /* Footer designed by AMH */
+.fdesign:hover {
+    color: rgba(255,255,255,.9) !important;
+    background: rgba(184,145,42,.15);
+    transform: translateY(-2px);
+}
+
+.fdesign:hover span {
+    color: var(--gold) !important;
+    text-shadow: 0 0 10px rgba(184,145,42,.3);
+}
+</style>
+
+<script>
+    const slides=document.querySelectorAll('.slide');
+    const dotsEl=document.getElementById('ndots');
+    const fillEl=document.getElementById('pf');
+    const curEl=document.getElementById('ncur');
+    const totEl=document.getElementById('ntot');
+    let cur=0,lock=false;
+
+    totEl.textContent=String(slides.length).padStart(2,'0');
+    slides.forEach((_,i)=>{
+        const d=document.createElement('div');
+        d.className='ndot'+(i===0?' active':'');
+        d.addEventListener('click',()=>goToSlide(i));
+        dotsEl.appendChild(d);
+    });
+
+    function goToSlide(idx){
+    if(lock || idx === cur || idx < 0 || idx >= slides.length) return;
+    lock = true;
+    
+    // Retirer visible de la slide actuelle
+    slides[cur].classList.remove('visible');
+    dotsEl.children[cur].classList.remove('active');
+    
+    // Mettre à jour l'index
+    cur = idx;
+    
+    // Ajouter visible à la nouvelle slide
+    slides[cur].classList.add('visible');
+    dotsEl.children[cur].classList.add('active');
+    curEl.textContent = String(cur + 1).padStart(2, '0');
+    
+    // Mettre à jour la barre de progression
+    fillEl.style.width = (cur / (slides.length - 1) * 100) + '%';
+    
+    // Scroll vers la slide
+    slides[cur].scrollIntoView({behavior: 'smooth', block: 'start'});
+    
+    // Animation stagger
+    slides[cur].querySelectorAll('.stagger').forEach(el => {
+        el.classList.remove('in');
+        setTimeout(() => el.classList.add('in'), 360);
+    });
+    
+    setTimeout(() => lock = false, 950);
+}
+    window.goToSlide=goToSlide;
+
+    document.getElementById('pb').addEventListener('click',()=>goToSlide(cur-1));
+    document.getElementById('nb').addEventListener('click',()=>goToSlide(cur+1));
+
+    let wcd=false;
+    window.addEventListener('wheel',e=>{
+        if(wcd)return;wcd=true;
+        e.deltaY>0?goToSlide(cur+1):goToSlide(cur-1);
+        setTimeout(()=>wcd=false,1100);
+    },{passive:true});
+
+    document.addEventListener('keydown',e=>{
+        if(e.key==='ArrowDown'||e.key==='PageDown'){e.preventDefault();goToSlide(cur+1);}
+        if(e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();goToSlide(cur-1);}
+    });
+
+    let ts=0;
+    document.addEventListener('touchstart',e=>ts=e.changedTouches[0].clientY,{passive:true});
+    document.addEventListener('touchend',e=>{
+        const d=ts-e.changedTouches[0].clientY;
+        if(Math.abs(d)>50)d>0?goToSlide(cur+1):goToSlide(cur-1);
+    },{passive:true});
+
+    slides[0].classList.add('visible');
+dotsEl.children[0].classList.add('active');
+slides[0].querySelectorAll('.stagger').forEach(el => el.classList.add('in'));
+fillEl.style.width = '0%';
+</script>
+</body>
+</html>
